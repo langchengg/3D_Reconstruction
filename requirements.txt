@@ -1,0 +1,10 @@
+numpy>=1.24
+opencv-python>=4.8
+pyyaml>=6.0
+matplotlib>=3.7
+open3d>=0.18
+torch>=2.1
+
+# Depth Anything V2 is developed as a standalone repository.
+# Install the official package/repo so that `from depth_anything_v2.dpt import DepthAnythingV2` works.
+

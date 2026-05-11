@@ -1,0 +1,65 @@
+project:
+  name: "Video2World-Lite"
+  description: "Monocular video to robot-centric 3D world model"
+
+input:
+  video_path: "data/raw/input_video.mp4"
+  frame_dir: "data/frames"
+
+preprocessing:
+  frame_rate: 2
+  max_frames: 60
+  resize_width: 1024
+  blur_threshold: 80.0
+
+colmap:
+  workspace: "outputs/colmap"
+  matcher: "sequential"
+  camera_model: "SIMPLE_PINHOLE"
+  data_type: "VIDEO"
+  quality: "MEDIUM"
+
+depth:
+  model: "depth-anything-v2-small"
+  mode: "depth-anything-v2"
+  encoder: "vits"
+  checkpoint: ""
+  device: "mps"
+  input_size: 518
+  save_numpy: true
+  save_visualization: true
+  heuristic_min_depth: 0.5
+  heuristic_max_depth: 4.0
+
+scale_alignment:
+  enabled: true
+  method: "robust_linear_fit"
+  min_sparse_points_per_frame: 50
+  trim_quantile: 0.1
+  invert_prediction: false
+
+fusion:
+  pixel_stride: 6
+  min_depth: 0.2
+  max_depth: 8.0
+  voxel_size: 0.03
+  max_points_per_frame: 80000
+
+cleaning:
+  remove_outliers: true
+  statistical_nb_neighbors: 20
+  statistical_std_ratio: 2.0
+  radius_outlier_removal: true
+  radius: 0.08
+  radius_nb_points: 12
+
+world_model:
+  estimate_floor: true
+  estimate_obstacles: true
+  save_json: true
+
+visualization:
+  save_camera_trajectory: true
+  save_scene_preview: true
+  save_demo_video: false
+

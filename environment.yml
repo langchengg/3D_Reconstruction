@@ -1,0 +1,14 @@
+name: video2world-lite
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - pyyaml
+  - matplotlib
+  - pip:
+      - opencv-python>=4.8
+      - open3d>=0.18
+      - torch>=2.1
+
