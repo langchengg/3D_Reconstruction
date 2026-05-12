@@ -1,0 +1,32 @@
+{
+  "scene_id": "IMG_9574",
+  "input_video": "data/raw/IMG_9574.MOV",
+  "num_keyframes": 22,
+  "num_registered_frames": 22,
+  "num_sparse_points": 9382,
+  "num_dense_points_raw": 1143648,
+  "num_dense_points_cleaned": 1101661,
+  "outputs": {
+    "raw_pointcloud": "outputs/img9574_readme/pointclouds/raw_scene.ply",
+    "cleaned_pointcloud": "outputs/img9574_readme/pointclouds/cleaned_scene.ply",
+    "presentation_pointcloud": "outputs/img9574_readme/pointclouds/presentation_scene.ply",
+    "camera_trajectory": "outputs/img9574_readme/visualizations/camera_trajectory.png",
+    "scene_preview": "outputs/img9574_readme/visualizations/scene_preview.png",
+    "hero_scene": "outputs/img9574_readme/visualizations/hero_scene.png",
+    "depth_grid": "outputs/img9574_readme/visualizations/depth_grid.png",
+    "mesh": "outputs/img9574_readme/meshes/scene_mesh.ply",
+    "mesh_preview": "outputs/img9574_readme/visualizations/mesh_preview.png"
+  },
+  "coordinate_frame": "COLMAP_world",
+  "limitations": [
+    "Monocular video has scale ambiguity.",
+    "Reflective, transparent, and textureless surfaces may reduce reconstruction quality.",
+    "Dynamic objects are not explicitly handled.",
+    "The coordinate frame is inherited from COLMAP and is not gravity-aligned by default."
+  ],
+  "robot_relevant_cues": {
+    "floor_estimated": false,
+    "obstacle_regions_estimated": true,
+    "scale_aligned_with_colmap": true
+  }
+}

@@ -59,6 +59,50 @@ def fit_scale_shift(
     return AlignmentResult(float(scale), float(shift), int(inlier_mask.sum()), True)
 
 
+def choose_global_alignment(
+    raw_prediction: np.ndarray,
+    sparse_depth: np.ndarray,
+    *,
+    prediction_transform: str,
+    min_points: int = 3,
+    trim_quantile: float = 0.1,
+) -> tuple[str, AlignmentResult]:
+    """Choose identity/inverse depth transform and fit one global scale-shift."""
+    candidates = ["identity", "inverse"] if prediction_transform == "auto" else [prediction_transform]
+    results: list[tuple[str, AlignmentResult, float]] = []
+    sparse = np.asarray(sparse_depth, dtype=np.float64).reshape(-1)
+
+    for transform in candidates:
+        pred = apply_prediction_transform(raw_prediction, transform)
+        valid = np.isfinite(pred) & np.isfinite(sparse)
+        result = fit_scale_shift(pred[valid], sparse[valid], min_points=min_points, trim_quantile=trim_quantile)
+        if result.success:
+            residual = np.abs((result.scale * pred[valid] + result.shift) - sparse[valid])
+            score = float(np.median(residual)) if len(residual) else float("inf")
+        else:
+            score = float("inf")
+        results.append((transform, result, score))
+
+    positive = [item for item in results if item[1].success and item[1].scale > 0]
+    if positive:
+        transform, result, _score = min(positive, key=lambda item: item[2])
+        return transform, result
+    transform, result, _score = min(results, key=lambda item: item[2])
+    return transform, result
+
+
+def apply_prediction_transform(depth: np.ndarray, prediction_transform: str) -> np.ndarray:
+    arr = np.asarray(depth, dtype=np.float64)
+    if prediction_transform == "identity":
+        return arr
+    if prediction_transform == "inverse":
+        transformed = np.full_like(arr, np.nan, dtype=np.float64)
+        valid = np.isfinite(arr) & (np.abs(arr) > 1e-8)
+        transformed[valid] = 1.0 / arr[valid]
+        return transformed
+    raise ValueError(f"Unsupported prediction transform: {prediction_transform}")
+
+
 def _least_squares_line(x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
     design = np.stack([x, np.ones_like(x)], axis=1)
     scale, shift = np.linalg.lstsq(design, y, rcond=None)[0]
@@ -106,4 +150,3 @@ def align_depth_map(depth_map: np.ndarray, result: AlignmentResult) -> np.ndarra
         raise ValueError(f"Cannot align depth map with failed result: {result.reason}")
     aligned = result.scale * np.asarray(depth_map, dtype=np.float64) + result.shift
     return aligned.astype(np.float32)
-

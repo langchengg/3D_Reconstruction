@@ -18,3 +18,5 @@ third_party/
 !data/frames/.gitkeep
 !data/samples/.gitkeep
 !assets/example_outputs/.gitkeep
+!assets/example_outputs/*.png
+!assets/example_outputs/*.json

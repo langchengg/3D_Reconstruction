@@ -34,15 +34,17 @@ depth:
 
 scale_alignment:
   enabled: true
+  scope: "global"
   method: "robust_linear_fit"
   min_sparse_points_per_frame: 3
   trim_quantile: 0.1
-  invert_prediction: true
+  prediction_transform: "auto"
+  invert_prediction: false
 
 fusion:
   pixel_stride: 6
   min_depth: 0.2
-  max_depth: 8.0
+  max_depth: 250.0
   voxel_size: 0.03
   max_points_per_frame: 80000
 
@@ -50,7 +52,7 @@ cleaning:
   remove_outliers: true
   statistical_nb_neighbors: 20
   statistical_std_ratio: 2.0
-  radius_outlier_removal: true
+  radius_outlier_removal: false
   radius: 0.08
   radius_nb_points: 12
 
@@ -63,3 +65,22 @@ visualization:
   save_camera_trajectory: true
   save_scene_preview: true
   save_demo_video: false
+
+presentation:
+  enabled: true
+  lower_quantile: 0.03
+  upper_quantile: 0.97
+  margin_ratio: 0.20
+  min_margin: 1.0
+  render_width: 1400
+  render_height: 1000
+  render_max_points: 220000
+  render_point_radius: 2
+  depth_grid_columns: 4
+  depth_grid_max_items: 8
+
+mesh:
+  enabled: true
+  max_points: 60000
+  poisson_depth: 7
+  density_quantile: 0.02
