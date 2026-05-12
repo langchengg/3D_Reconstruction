@@ -1,0 +1,27 @@
+{
+  "enabled": true,
+  "method": "geometry_derived_plane_and_height_labels",
+  "label_space": [
+    "support_plane",
+    "obstacle",
+    "unknown"
+  ],
+  "num_points": 909540,
+  "num_labeled_points": 238724,
+  "semantic_coverage": 0.2624667414297337,
+  "label_counts": {
+    "unknown": 670816,
+    "support_plane": 12133,
+    "obstacle": 226591
+  },
+  "obstacle_height": 11.089066018538444,
+  "support_plane": {
+    "normal": [
+      0.41041974605710846,
+      -0.05269827269023612,
+      0.910372739102992
+    ],
+    "offset": -57.56270650971211,
+    "num_inliers": 12101
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "num_keyframes": 22,
+  "num_registered_frames": 22,
+  "registration_ratio": 1.0,
+  "num_sparse_points": 9382,
+  "num_dense_points_raw": 1143648,
+  "num_dense_points_cleaned": 1101661,
+  "alignment_success_rate": 1.0,
+  "median_alignment_residual": 0.10071258698789176,
+  "median_alignment_residual_colmap_scale": 6.898590471403708,
+  "outlier_removed_ratio": 0.03671321945213912,
+  "has_camera_trajectory": true,
+  "has_cleaned_pointcloud": true,
+  "has_semantic_scene": true,
+  "has_world_model_json": true,
+  "semantic_coverage": 0.2624667414297337,
+  "num_semantic_labeled_points": 238724
+}

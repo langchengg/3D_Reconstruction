@@ -15,7 +15,10 @@
     "hero_scene": "outputs/img9574_readme/visualizations/hero_scene.png",
     "depth_grid": "outputs/img9574_readme/visualizations/depth_grid.png",
     "mesh": "outputs/img9574_readme/meshes/scene_mesh.ply",
-    "mesh_preview": "outputs/img9574_readme/visualizations/mesh_preview.png"
+    "mesh_preview": "outputs/img9574_readme/visualizations/mesh_preview.png",
+    "semantic_pointcloud": "outputs/img9574_readme/pointclouds/semantic_scene.ply",
+    "semantic_preview": "outputs/img9574_readme/visualizations/semantic_scene.png",
+    "semantic_summary": "outputs/img9574_readme/world_model/semantic_objects.json"
   },
   "coordinate_frame": "COLMAP_world",
   "limitations": [
@@ -25,8 +28,19 @@
     "The coordinate frame is inherited from COLMAP and is not gravity-aligned by default."
   ],
   "robot_relevant_cues": {
-    "floor_estimated": false,
+    "floor_estimated": true,
     "obstacle_regions_estimated": true,
     "scale_aligned_with_colmap": true
+  },
+  "semantics": {
+    "enabled": true,
+    "label_space": [
+      "support_plane",
+      "obstacle",
+      "unknown"
+    ],
+    "num_labeled_points": 238724,
+    "semantic_coverage": 0.2624667414297337,
+    "method": "geometry_derived_plane_and_height_labels"
   }
 }
