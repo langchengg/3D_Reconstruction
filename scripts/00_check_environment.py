@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+from pathlib import Path
 import shutil
 import sys
 
@@ -25,6 +26,10 @@ def main() -> int:
     print("Optional Python packages:")
     for name in optional:
         print(f"  {name}: {package_status(name)}")
+    repo = Path("third_party/Depth-Anything-V2")
+    checkpoint = repo / "checkpoints" / "depth_anything_v2_vits.pth"
+    print(f"Depth Anything V2 official repo: {repo if repo.exists() else 'MISSING'}")
+    print(f"Depth Anything V2 Small checkpoint: {checkpoint if checkpoint.exists() else 'MISSING'}")
     print(f"COLMAP executable: {shutil.which('colmap') or 'MISSING'}")
     if missing_required:
         print(f"Missing required packages: {', '.join(missing_required)}")
@@ -34,4 +39,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-

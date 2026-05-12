@@ -29,8 +29,8 @@ pip install -r requirements.txt
 Install external tools:
 
 - COLMAP must be available as `colmap` on `PATH`.
-- Depth Anything V2 must be installed from the official repository.
-- Set `depth.checkpoint` in `config/default.yaml` to your downloaded checkpoint, for example a small `vits` checkpoint.
+- Depth Anything V2 must be available from the official repository.
+- The default config expects the official repo at `third_party/Depth-Anything-V2` and the small checkpoint at `third_party/Depth-Anything-V2/checkpoints/depth_anything_v2_vits.pth`.
 
 Check the environment:
 
@@ -120,6 +120,8 @@ world_model/world_model.json
 - **COLMAP for poses**: reliable classical SfM gives camera trajectory and sparse anchors instead of relying entirely on a learned model.
 - **Depth Anything V2 for density**: pretrained dense depth fills surfaces that sparse SfM cannot represent.
 - **Scale alignment before fusion**: predicted monocular depth is not treated as metric truth. Sparse COLMAP geometry provides per-frame geometric anchors.
+- **Permissive demo alignment**: `min_sparse_points_per_frame` defaults to `3` so short videos can exercise the alignment path; increase it for stricter experiments.
+- **Depth direction check**: `invert_prediction` defaults to `true` because Depth Anything V2 relative predictions behave like inverse depth on this pipeline.
 - **Point cloud first**: PLY is simple, inspectable, and compatible with common robotics/3D tooling.
 - **No training required**: the project is designed to run on consumer hardware, including Apple Silicon, without fine-tuning.
 
@@ -147,4 +149,3 @@ Covered behavior includes COLMAP text parsing, quaternion pose conversion, depth
 - Estimate a gravity-aligned floor plane and navigable free-space regions.
 - Add a browser-based viewer for inspecting camera trajectory and point cloud artifacts.
 - Add dynamic object filtering before fusion.
-

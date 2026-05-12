@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import sys
 
 import numpy as np
 
@@ -39,9 +40,21 @@ class DepthAnythingV2Estimator:
         "vitl": {"encoder": "vitl", "features": 256, "out_channels": [256, 512, 1024, 1024]},
     }
 
-    def __init__(self, *, encoder: str, checkpoint: str | Path, device: str, input_size: int = 518) -> None:
+    def __init__(
+        self,
+        *,
+        encoder: str,
+        checkpoint: str | Path,
+        device: str,
+        input_size: int = 518,
+        repo_path: str | Path | None = None,
+    ) -> None:
         if encoder not in self.MODEL_CONFIGS:
             raise ValueError(f"Unsupported Depth Anything V2 encoder: {encoder}")
+        if repo_path:
+            repo = Path(repo_path)
+            if repo.exists() and str(repo) not in sys.path:
+                sys.path.insert(0, str(repo))
         checkpoint_path = Path(checkpoint)
         if not checkpoint_path.exists():
             raise FileNotFoundError(
@@ -92,6 +105,7 @@ def create_depth_estimator(config: dict) -> HeuristicDepthEstimator | DepthAnyth
             checkpoint=str(config.get("checkpoint", "")),
             device=str(config.get("device", "cpu")),
             input_size=int(config.get("input_size", 518)),
+            repo_path=str(config.get("repo_path", "")),
         )
     raise ValueError(f"Unknown depth mode: {mode}")
 
@@ -133,4 +147,3 @@ def save_depth_preview(depth: np.ndarray, output_path: str | Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(str(path), colored)
     return path
-

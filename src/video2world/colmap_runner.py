@@ -18,6 +18,38 @@ def run_colmap_stage(args: list[str]) -> None:
     subprocess.run(command, check=True)
 
 
+def feature_extractor_args(database_path: str | Path, image_path: str | Path, camera_model: str) -> list[str]:
+    return [
+        "feature_extractor",
+        "--database_path",
+        str(database_path),
+        "--image_path",
+        str(image_path),
+        "--ImageReader.camera_model",
+        camera_model,
+        "--ImageReader.single_camera",
+        "1",
+        "--FeatureExtraction.use_gpu",
+        "0",
+    ]
+
+
+def matcher_args(matcher: str, database_path: str | Path) -> list[str]:
+    if matcher == "sequential":
+        command = "sequential_matcher"
+    elif matcher == "exhaustive":
+        command = "exhaustive_matcher"
+    else:
+        raise ValueError(f"Unsupported COLMAP matcher: {matcher}")
+    return [
+        command,
+        "--database_path",
+        str(database_path),
+        "--FeatureMatching.use_gpu",
+        "0",
+    ]
+
+
 def run_sparse_reconstruction(frame_dir: str | Path, workspace: str | Path, *, matcher: str, camera_model: str) -> None:
     image_path = Path(frame_dir)
     workspace_path = Path(workspace)
@@ -26,23 +58,8 @@ def run_sparse_reconstruction(frame_dir: str | Path, workspace: str | Path, *, m
     sparse_path.mkdir(parents=True, exist_ok=True)
     database_path = workspace_path / "database.db"
 
-    run_colmap_stage(
-        [
-            "feature_extractor",
-            "--database_path",
-            str(database_path),
-            "--image_path",
-            str(image_path),
-            "--ImageReader.camera_model",
-            camera_model,
-        ]
-    )
-    if matcher == "sequential":
-        run_colmap_stage(["sequential_matcher", "--database_path", str(database_path)])
-    elif matcher == "exhaustive":
-        run_colmap_stage(["exhaustive_matcher", "--database_path", str(database_path)])
-    else:
-        raise ValueError(f"Unsupported COLMAP matcher: {matcher}")
+    run_colmap_stage(feature_extractor_args(database_path, image_path, camera_model))
+    run_colmap_stage(matcher_args(matcher, database_path))
     run_colmap_stage(
         [
             "mapper",
@@ -70,4 +87,3 @@ def convert_model_to_text(input_model: str | Path, output_model: str | Path) -> 
             "TXT",
         ]
     )
-

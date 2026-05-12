@@ -12,6 +12,8 @@ COLMAP gives sparse but geometrically grounded structure. Depth Anything V2 give
 
 The implementation aligns predicted dense depth to COLMAP sparse points before fusion. This is a deliberate response to a central monocular reconstruction failure mode.
 
+Depth Anything V2 relative predictions are treated as inverse-depth-like by default before fitting to COLMAP camera-z. This keeps the fitted scale positive on typical indoor videos where larger raw predictions indicate closer surfaces.
+
 ## Lightweight Outputs
 
 PLY and JSON are easy to inspect and easy to reuse. They are also better for a challenge submission than opaque notebook state.
@@ -19,4 +21,3 @@ PLY and JSON are easy to inspect and easy to reuse. They are also better for a c
 ## Optional Semantics
 
 Semantic labels are left as an extension because the core requirement is geometric coherence. A robust next step is to run 2D segmentation, project masks into the fused cloud, and aggregate labels per 3D point or object region.
-

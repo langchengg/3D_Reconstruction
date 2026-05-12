@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import numpy as np
@@ -9,6 +10,10 @@ from video2world.fusion import PointCloud
 
 
 def _setup_matplotlib():
+    cache_dir = Path.cwd() / ".cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    os.environ.setdefault("MPLCONFIGDIR", str(cache_dir / "matplotlib"))
+    os.environ.setdefault("XDG_CACHE_HOME", str(cache_dir))
     import matplotlib
 
     matplotlib.use("Agg")
@@ -67,4 +72,3 @@ def save_pointcloud_preview(cloud: PointCloud, output_path: str | Path, *, max_p
     fig.savefig(path, dpi=180)
     plt.close(fig)
     return path
-

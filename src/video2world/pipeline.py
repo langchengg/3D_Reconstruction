@@ -21,10 +21,25 @@ def find_sparse_model_dir(sparse_root: str | Path) -> Path:
     root = Path(sparse_root)
     if (root / "cameras.bin").exists() or (root / "cameras.txt").exists():
         return root
-    candidates = sorted([path for path in root.iterdir() if path.is_dir()]) if root.exists() else []
+    candidates = sorted([path for path in root.iterdir() if _looks_like_sparse_model(path)]) if root.exists() else []
     if not candidates:
         raise FileNotFoundError(f"No COLMAP sparse model directory found under {root}")
-    return candidates[0]
+    return max(candidates, key=_sparse_model_score)
+
+
+def _looks_like_sparse_model(path: Path) -> bool:
+    return path.is_dir() and ((path / "cameras.bin").exists() or (path / "cameras.txt").exists())
+
+
+def _sparse_model_score(path: Path) -> tuple[int, int, int]:
+    """Prefer reconstructions with more registered image data and more sparse structure."""
+    images_size = _file_size(path / "images.bin") + _file_size(path / "images.txt")
+    points_size = _file_size(path / "points3D.bin") + _file_size(path / "points3D.txt")
+    return (images_size, points_size, -len(path.name))
+
+
+def _file_size(path: Path) -> int:
+    return path.stat().st_size if path.exists() else 0
 
 
 def list_frame_paths(frame_dir: str | Path) -> list[Path]:

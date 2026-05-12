@@ -3,6 +3,7 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.cache/
 .venv/
 venv/
 
@@ -11,9 +12,9 @@ data/frames/*
 data/samples/*
 outputs/
 assets/example_outputs/*
+third_party/
 
 !data/raw/.gitkeep
 !data/frames/.gitkeep
 !data/samples/.gitkeep
 !assets/example_outputs/.gitkeep
-

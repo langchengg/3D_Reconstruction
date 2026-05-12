@@ -20,7 +20,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "frame_rate": 2.0,
         "max_frames": 60,
         "resize_width": 1024,
-        "blur_threshold": 80.0,
+        "blur_threshold": 10.0,
     },
     "colmap": {
         "workspace": "outputs/colmap",
@@ -32,8 +32,9 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "depth": {
         "model": "depth-anything-v2-small",
         "mode": "depth-anything-v2",
+        "repo_path": "third_party/Depth-Anything-V2",
         "encoder": "vits",
-        "checkpoint": "",
+        "checkpoint": "third_party/Depth-Anything-V2/checkpoints/depth_anything_v2_vits.pth",
         "device": "mps",
         "input_size": 518,
         "save_numpy": True,
@@ -44,9 +45,9 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "scale_alignment": {
         "enabled": True,
         "method": "robust_linear_fit",
-        "min_sparse_points_per_frame": 50,
+        "min_sparse_points_per_frame": 3,
         "trim_quantile": 0.1,
-        "invert_prediction": False,
+        "invert_prediction": True,
     },
     "fusion": {
         "pixel_stride": 6,
@@ -96,4 +97,3 @@ def load_config(path: str | Path | None = None) -> dict[str, Any]:
     if not isinstance(loaded, dict):
         raise ValueError(f"Config root must be a mapping: {config_path}")
     return deep_update(DEFAULT_CONFIG, loaded)
-

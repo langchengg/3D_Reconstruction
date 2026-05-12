@@ -10,7 +10,7 @@ preprocessing:
   frame_rate: 2
   max_frames: 60
   resize_width: 1024
-  blur_threshold: 80.0
+  blur_threshold: 10.0
 
 colmap:
   workspace: "outputs/colmap"
@@ -22,8 +22,9 @@ colmap:
 depth:
   model: "depth-anything-v2-small"
   mode: "depth-anything-v2"
+  repo_path: "third_party/Depth-Anything-V2"
   encoder: "vits"
-  checkpoint: ""
+  checkpoint: "third_party/Depth-Anything-V2/checkpoints/depth_anything_v2_vits.pth"
   device: "mps"
   input_size: 518
   save_numpy: true
@@ -34,9 +35,9 @@ depth:
 scale_alignment:
   enabled: true
   method: "robust_linear_fit"
-  min_sparse_points_per_frame: 50
+  min_sparse_points_per_frame: 3
   trim_quantile: 0.1
-  invert_prediction: false
+  invert_prediction: true
 
 fusion:
   pixel_stride: 6
@@ -62,4 +63,3 @@ visualization:
   save_camera_trajectory: true
   save_scene_preview: true
   save_demo_video: false
-
