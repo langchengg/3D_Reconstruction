@@ -6,22 +6,22 @@
     "obstacle",
     "unknown"
   ],
-  "num_points": 909540,
-  "num_labeled_points": 238724,
-  "semantic_coverage": 0.2624667414297337,
+  "num_points": 989032,
+  "num_labeled_points": 246698,
+  "semantic_coverage": 0.24943378980659878,
   "label_counts": {
-    "unknown": 670816,
-    "support_plane": 12133,
-    "obstacle": 226591
+    "unknown": 742334,
+    "support_plane": 11552,
+    "obstacle": 235146
   },
-  "obstacle_height": 11.089066018538444,
+  "obstacle_height": 14.296590012707181,
   "support_plane": {
     "normal": [
-      0.41041974605710846,
-      -0.05269827269023612,
-      0.910372739102992
+      0.4293334074606674,
+      0.012196778996122473,
+      0.9030637097239222
     ],
-    "offset": -57.56270650971211,
-    "num_inliers": 12101
+    "offset": -63.88863285515498,
+    "num_inliers": 11539
   }
 }

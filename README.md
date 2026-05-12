@@ -110,14 +110,14 @@ The current sample run writes `assets/example_outputs/evaluation_report.json` an
 | Keyframes | 22 |
 | COLMAP registered frames | 22 |
 | Registration ratio | 1.00 |
-| Sparse SfM points | 9,382 |
+| Sparse SfM points | 8,369 |
 | Raw dense points | 1,143,648 |
-| Cleaned dense points | 1,101,661 |
+| Cleaned dense points | 1,101,192 |
 | Alignment success rate | 1.00 |
-| Median normalized alignment residual | 0.1007 |
-| Outlier removed ratio | 0.0367 |
-| Semantic labeled points | 238,724 |
-| Semantic coverage | 0.2625 |
+| Median normalized alignment residual | 0.1071 |
+| Outlier removed ratio | 0.0371 |
+| Semantic labeled points | 246,698 |
+| Semantic coverage | 0.2494 |
 
 The normalized alignment residual is `abs(aligned_depth - sparse_depth) / sparse_depth`, so it is more interpretable than raw residual in COLMAP's arbitrary reconstruction scale.
 

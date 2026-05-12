@@ -3,22 +3,23 @@
   "input_video": "data/raw/IMG_9574.MOV",
   "num_keyframes": 22,
   "num_registered_frames": 22,
-  "num_sparse_points": 9382,
+  "num_sparse_points": 8369,
   "num_dense_points_raw": 1143648,
-  "num_dense_points_cleaned": 1101661,
+  "num_dense_points_cleaned": 1101192,
   "outputs": {
-    "raw_pointcloud": "outputs/img9574_readme/pointclouds/raw_scene.ply",
-    "cleaned_pointcloud": "outputs/img9574_readme/pointclouds/cleaned_scene.ply",
-    "presentation_pointcloud": "outputs/img9574_readme/pointclouds/presentation_scene.ply",
-    "camera_trajectory": "outputs/img9574_readme/visualizations/camera_trajectory.png",
-    "scene_preview": "outputs/img9574_readme/visualizations/scene_preview.png",
-    "hero_scene": "outputs/img9574_readme/visualizations/hero_scene.png",
-    "depth_grid": "outputs/img9574_readme/visualizations/depth_grid.png",
-    "mesh": "outputs/img9574_readme/meshes/scene_mesh.ply",
-    "mesh_preview": "outputs/img9574_readme/visualizations/mesh_preview.png",
-    "semantic_pointcloud": "outputs/img9574_readme/pointclouds/semantic_scene.ply",
-    "semantic_preview": "outputs/img9574_readme/visualizations/semantic_scene.png",
-    "semantic_summary": "outputs/img9574_readme/world_model/semantic_objects.json"
+    "raw_pointcloud": "outputs/readme_latest/pointclouds/raw_scene.ply",
+    "cleaned_pointcloud": "outputs/readme_latest/pointclouds/cleaned_scene.ply",
+    "presentation_pointcloud": "outputs/readme_latest/pointclouds/presentation_scene.ply",
+    "camera_trajectory": "outputs/readme_latest/visualizations/camera_trajectory.png",
+    "scene_preview": "outputs/readme_latest/visualizations/scene_preview.png",
+    "hero_scene": "outputs/readme_latest/visualizations/hero_scene.png",
+    "hero_camera_view": "outputs/readme_latest/visualizations/hero_camera_view.png",
+    "depth_grid": "outputs/readme_latest/visualizations/depth_grid.png",
+    "mesh": "outputs/readme_latest/meshes/scene_mesh.ply",
+    "mesh_preview": "outputs/readme_latest/visualizations/mesh_preview.png",
+    "semantic_pointcloud": "outputs/readme_latest/pointclouds/semantic_scene.ply",
+    "semantic_preview": "outputs/readme_latest/visualizations/semantic_scene.png",
+    "semantic_summary": "outputs/readme_latest/world_model/semantic_objects.json"
   },
   "coordinate_frame": "COLMAP_world",
   "limitations": [
@@ -39,8 +40,8 @@
       "obstacle",
       "unknown"
     ],
-    "num_labeled_points": 238724,
-    "semantic_coverage": 0.2624667414297337,
+    "num_labeled_points": 246698,
+    "semantic_coverage": 0.24943378980659878,
     "method": "geometry_derived_plane_and_height_labels"
   }
 }
