@@ -8,7 +8,8 @@ from pathlib import Path
 import _bootstrap  # noqa: F401
 
 from video2world.fusion import read_ply_ascii
-from video2world.presentation import render_point_cloud_splat
+from video2world.colmap_io import read_colmap_text_model
+from video2world.presentation import render_point_cloud_camera_view, render_point_cloud_splat
 from video2world.semantics import (
     attach_semantics_to_world_model,
     derive_geometry_semantics,
@@ -24,7 +25,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", default=None, help="Output semantic PLY path")
     parser.add_argument("--summary", default=None, help="Output semantic JSON path")
     parser.add_argument("--preview", default=None, help="Output semantic preview PNG path")
-    parser.add_argument("--distance-threshold", type=float, default=0.08)
+    parser.add_argument(
+        "--distance-threshold",
+        type=float,
+        default=None,
+        help="Support-plane inlier distance. Defaults to scene_bbox_diagonal * distance_threshold_ratio.",
+    )
+    parser.add_argument(
+        "--distance-threshold-ratio",
+        type=float,
+        default=0.005,
+        help="Scene-scale threshold ratio used when --distance-threshold is omitted.",
+    )
     parser.add_argument(
         "--obstacle-height",
         type=float,
@@ -47,12 +59,13 @@ def main() -> None:
     result = derive_geometry_semantics(
         cloud,
         distance_threshold=args.distance_threshold,
+        distance_threshold_ratio=args.distance_threshold_ratio,
         obstacle_height=args.obstacle_height,
         ransac_iterations=args.ransac_iterations,
     )
     write_semantic_ply_ascii(result, output_path)
     save_semantic_summary(result, summary_path)
-    render_point_cloud_splat(result.semantic_cloud, preview_path, point_radius=2)
+    _render_semantic_preview(run_dir, result.semantic_cloud, preview_path)
     attach_semantics_to_world_model(
         run_dir / "world_model" / "world_model.json",
         result.summary,
@@ -74,6 +87,26 @@ def _default_input(run_dir: Path) -> Path:
     if presentation.exists():
         return presentation
     return run_dir / "pointclouds" / "cleaned_scene.ply"
+
+
+def _render_semantic_preview(run_dir: Path, semantic_cloud, preview_path: Path) -> None:
+    model_dir = run_dir / "colmap" / "text_model"
+    try:
+        model = read_colmap_text_model(model_dir)
+        image = sorted(model.images.values(), key=lambda item: item.image_id)[len(model.images) // 2]
+        camera = model.cameras[image.camera_id]
+        render_point_cloud_camera_view(
+            semantic_cloud,
+            camera.intrinsics,
+            image.rotation_world_to_camera,
+            image.tvec,
+            preview_path,
+            width=camera.width,
+            height=camera.height,
+            point_radius=2,
+        )
+    except (FileNotFoundError, ValueError, IndexError):
+        render_point_cloud_splat(semantic_cloud, preview_path, point_radius=2)
 
 
 if __name__ == "__main__":

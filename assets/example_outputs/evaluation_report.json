@@ -1,18 +1,18 @@
 {
-  "num_keyframes": 22,
-  "num_registered_frames": 22,
+  "num_keyframes": 60,
+  "num_registered_frames": 60,
   "registration_ratio": 1.0,
-  "num_sparse_points": 8369,
-  "num_dense_points_raw": 1143648,
-  "num_dense_points_cleaned": 1101192,
+  "num_sparse_points": 9482,
+  "num_dense_points_raw": 3119040,
+  "num_dense_points_cleaned": 2971256,
   "alignment_success_rate": 1.0,
-  "median_alignment_residual": 0.1071224875996565,
-  "median_alignment_residual_colmap_scale": 8.509388010399945,
-  "outlier_removed_ratio": 0.03712331066901704,
+  "median_alignment_residual": 0.04631526534286466,
+  "median_alignment_residual_colmap_scale": 1.465918559597263,
+  "outlier_removed_ratio": 0.047381245511439414,
   "has_camera_trajectory": true,
   "has_cleaned_pointcloud": true,
   "has_semantic_scene": true,
   "has_world_model_json": true,
-  "semantic_coverage": 0.24943378980659878,
-  "num_semantic_labeled_points": 246698
+  "semantic_coverage": 0.32811969315159756,
+  "num_semantic_labeled_points": 654040
 }

@@ -67,7 +67,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "radius_nb_points": 12,
     },
     "world_model": {
-        "estimate_floor": True,
+        "estimate_support_plane": True,
         "estimate_obstacles": True,
         "save_json": True,
     },

@@ -76,7 +76,10 @@ Key design choices:
 - **COLMAP for poses**: classical SfM provides camera trajectory and sparse geometric anchors.
 - **Depth Anything V2 for density**: pretrained monocular depth fills surfaces that sparse SfM cannot represent.
 - **Global scale alignment**: monocular depth is not treated as metric truth. Dense predictions are globally aligned to COLMAP sparse depth samples before fusion.
+- **Scale-aware cleaning**: fused clouds are MAD-cropped for extreme depth outliers before Open3D voxel filtering, and voxel size is guarded relative to scene scale.
+- **Scene-scale semantic thresholds**: COLMAP coordinates are scale-ambiguous, so support-plane thresholds are selected relative to scene bounding-box size instead of fixed metric units.
 - **Robot-centric packaging**: final outputs include geometry, trajectory, semantic cues, metrics, limitations, and artifact paths.
+- **Mesh kept optional**: Poisson mesh reconstruction is disabled by default because point clouds are the primary deliverable and mesh fitting can be slow or brittle on large noisy reconstructions.
 - **No training required**: designed to run on consumer hardware, including Apple Silicon.
 
 ## Example Results
@@ -107,17 +110,17 @@ The current sample run writes `assets/example_outputs/evaluation_report.json` an
 
 | Metric | Value |
 | --- | ---: |
-| Keyframes | 22 |
-| COLMAP registered frames | 22 |
+| Keyframes | 60 |
+| COLMAP registered frames | 60 |
 | Registration ratio | 1.00 |
-| Sparse SfM points | 8,369 |
-| Raw dense points | 1,143,648 |
-| Cleaned dense points | 1,101,192 |
+| Sparse SfM points | 9,482 |
+| Raw dense points | 3,119,040 |
+| Cleaned dense points | 2,971,256 |
 | Alignment success rate | 1.00 |
-| Median normalized alignment residual | 0.1071 |
-| Outlier removed ratio | 0.0371 |
-| Semantic labeled points | 246,698 |
-| Semantic coverage | 0.2494 |
+| Median normalized alignment residual | 0.0463 |
+| Outlier removed ratio | 0.0474 |
+| Semantic labeled points | 654,040 |
+| Semantic coverage | 0.3281 |
 
 The normalized alignment residual is `abs(aligned_depth - sparse_depth) / sparse_depth`, so it is more interpretable than raw residual in COLMAP's arbitrary reconstruction scale.
 
@@ -132,6 +135,8 @@ cleaned/presentation point cloud
 -> label points significantly above the plane as obstacle
 -> export semantic_scene.ply and semantic_objects.json
 ```
+
+Because COLMAP coordinates are scale-ambiguous, the support-plane inlier threshold is selected as a small fraction of the reconstructed scene's bounding-box diagonal by default. This avoids hard-coding metric thresholds such as `0.08m` into an arbitrary SfM coordinate system.
 
 This is not object recognition. The goal is to add robot-relevant spatial cues while keeping labels geometrically coherent. Since labels are assigned directly to reconstructed 3D points, the semantic point cloud cannot drift away from the geometry it describes.
 
@@ -164,6 +169,8 @@ make readme-assets RUN_DIR=outputs/demo_room
 make semantics RUN_DIR=outputs/demo_room
 make evaluate RUN_DIR=outputs/demo_room
 make submission-assets
+make view-example
+make smoke-demo
 ```
 
 Run the pipeline on a custom video:
@@ -176,6 +183,12 @@ Run a dependency-light smoke test of the depth stage:
 
 ```bash
 make smoke
+```
+
+Check the packaged example outputs without COLMAP or Depth Anything weights:
+
+```bash
+make smoke-demo
 ```
 
 ## Step-by-Step Usage
@@ -203,8 +216,10 @@ config/default.yaml
 scripts/run_demo.sh
 scripts/11_evaluate_reconstruction.py
 scripts/12_add_semantics.py
+scripts/14_check_example_assets.py
 src/video2world/evaluation.py
 src/video2world/semantics.py
+src/video2world/example_assets.py
 docs/capture_guide.md
 assets/pipeline.png
 assets/teaser.gif
@@ -231,15 +246,3 @@ make test
 ```
 
 Tests cover COLMAP text parsing, camera geometry, scale alignment, RGB-D fusion, presentation crop/rendering, evaluation metrics, geometry-derived semantics, PLY writing, and world-model JSON export.
-
-## Resume Summary
-
-```latex
-\textbf{Video2World-Lite: Robot-Centric 3D World Model from Monocular Video}
-\begin{itemize}
-    \item Built a lightweight video-to-3D reconstruction system for the Humanoid intern challenge, converting indoor phone videos into robot-centric 3D world models using COLMAP, Depth Anything V2, and Open3D/NumPy-based point cloud fusion.
-    \item Estimated camera trajectories and sparse geometry with SfM, aligned scale-ambiguous dense depth predictions to COLMAP sparse points, and fused registered RGB-D observations into cleaned colored PLY point clouds.
-    \item Added reconstruction evaluation and presentation artifacts including camera trajectory, depth grids, dense scene previews, world-model metadata, and quantitative point-cloud statistics.
-    \item Extended the geometry pipeline with semantic world-model cues such as support-plane and obstacle regions, ensuring semantic labels are assigned directly on reconstructed 3D geometry.
-\end{itemize}
-```

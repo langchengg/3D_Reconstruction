@@ -7,6 +7,60 @@ import numpy as np
 from video2world.fusion import PointCloud, write_ply_ascii
 
 
+def _filter_points(cloud: PointCloud, mask: np.ndarray) -> PointCloud:
+    mask = np.asarray(mask, dtype=bool)
+    if len(mask) != len(cloud.points):
+        raise ValueError("mask must match point count")
+    frame_ids = [frame_id for frame_id, keep in zip(cloud.frame_ids, mask.tolist(), strict=False) if keep]
+    return PointCloud(
+        points=cloud.points[mask],
+        colors=cloud.colors[mask],
+        frame_ids=frame_ids,
+    )
+
+
+def filter_finite_points(cloud: PointCloud) -> PointCloud:
+    if len(cloud.points) == 0:
+        return cloud
+    finite = np.isfinite(cloud.points).all(axis=1)
+    if bool(np.all(finite)):
+        return cloud
+    return _filter_points(cloud, finite)
+
+
+def robust_crop_mad(
+    cloud: PointCloud,
+    *,
+    mad_scale: float = 12.0,
+    min_keep_ratio: float = 0.25,
+) -> PointCloud:
+    """Remove extreme fused-depth outliers without assuming metric scale."""
+    if len(cloud.points) < 8 or mad_scale <= 0:
+        return cloud
+
+    points = cloud.points.astype(np.float64, copy=False)
+    median = np.median(points, axis=0)
+    mad = np.median(np.abs(points - median), axis=0)
+    spread = np.ptp(points, axis=0)
+    scale = np.maximum(mad, spread * 1e-6)
+    scale = np.maximum(scale, 1e-12)
+    keep = np.all(np.abs(points - median) <= mad_scale * scale, axis=1)
+    keep_ratio = float(np.mean(keep)) if len(keep) else 0.0
+    if keep_ratio < min_keep_ratio or not bool(np.any(keep)):
+        return cloud
+    return _filter_points(cloud, keep)
+
+
+def adaptive_voxel_size(points: np.ndarray, requested_voxel_size: float, min_scene_ratio: float = 1e-5) -> float:
+    if requested_voxel_size <= 0 or len(points) == 0:
+        return requested_voxel_size
+    bounds = np.ptp(points.astype(np.float64, copy=False), axis=0)
+    diagonal = float(np.linalg.norm(bounds))
+    if not np.isfinite(diagonal) or diagonal <= 0:
+        return requested_voxel_size
+    return max(float(requested_voxel_size), diagonal * float(min_scene_ratio))
+
+
 def voxel_downsample_numpy(cloud: PointCloud, voxel_size: float) -> PointCloud:
     if voxel_size <= 0 or len(cloud.points) == 0:
         return cloud
@@ -32,9 +86,26 @@ def clean_point_cloud(
     radius_outlier_removal: bool,
     radius: float,
     radius_nb_points: int,
+    robust_crop: bool = True,
+    robust_crop_mad_scale: float = 12.0,
+    robust_crop_min_keep_ratio: float = 0.25,
+    adaptive_voxel_min_scene_ratio: float = 1e-5,
 ) -> PointCloud:
     if len(cloud.points) == 0:
         return cloud
+
+    cloud = filter_finite_points(cloud)
+    if robust_crop:
+        cloud = robust_crop_mad(
+            cloud,
+            mad_scale=robust_crop_mad_scale,
+            min_keep_ratio=robust_crop_min_keep_ratio,
+        )
+    voxel_size = adaptive_voxel_size(
+        cloud.points,
+        voxel_size,
+        min_scene_ratio=adaptive_voxel_min_scene_ratio,
+    )
 
     try:
         import open3d as o3d
@@ -45,7 +116,10 @@ def clean_point_cloud(
     pcd.points = o3d.utility.Vector3dVector(cloud.points.astype(np.float64))
     pcd.colors = o3d.utility.Vector3dVector((cloud.colors.astype(np.float64) / 255.0).clip(0.0, 1.0))
     if voxel_size > 0:
-        pcd = pcd.voxel_down_sample(voxel_size)
+        try:
+            pcd = pcd.voxel_down_sample(voxel_size)
+        except RuntimeError:
+            return voxel_downsample_numpy(cloud, voxel_size)
     if remove_outliers and len(pcd.points) > statistical_nb_neighbors:
         pcd, _ = pcd.remove_statistical_outlier(
             nb_neighbors=statistical_nb_neighbors,
@@ -76,6 +150,9 @@ def clean_ply_file(input_ply: str | Path, output_ply: str | Path, config: dict) 
         radius_outlier_removal=bool(config.get("radius_outlier_removal", True)),
         radius=float(config.get("radius", 0.08)),
         radius_nb_points=int(config.get("radius_nb_points", 12)),
+        robust_crop=bool(config.get("robust_crop", True)),
+        robust_crop_mad_scale=float(config.get("robust_crop_mad_scale", 12.0)),
+        robust_crop_min_keep_ratio=float(config.get("robust_crop_min_keep_ratio", 0.25)),
+        adaptive_voxel_min_scene_ratio=float(config.get("adaptive_voxel_min_scene_ratio", 1e-5)),
     )
     return write_ply_ascii(cleaned, output_ply)
-

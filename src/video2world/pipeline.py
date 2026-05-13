@@ -271,6 +271,10 @@ def run_full_pipeline(
         radius_outlier_removal=bool(config["cleaning"]["radius_outlier_removal"]),
         radius=float(config["cleaning"]["radius"]),
         radius_nb_points=int(config["cleaning"]["radius_nb_points"]),
+        robust_crop=bool(config["cleaning"].get("robust_crop", True)),
+        robust_crop_mad_scale=float(config["cleaning"].get("robust_crop_mad_scale", 12.0)),
+        robust_crop_min_keep_ratio=float(config["cleaning"].get("robust_crop_min_keep_ratio", 0.25)),
+        adaptive_voxel_min_scene_ratio=float(config["cleaning"].get("adaptive_voxel_min_scene_ratio", 1e-5)),
     )
     cleaned_path = write_ply_ascii(cleaned, pointcloud_dir / "cleaned_scene.ply")
 
@@ -348,7 +352,7 @@ def run_full_pipeline(
         num_dense_points_raw=len(raw_cloud.points),
         num_dense_points_cleaned=len(cleaned.points),
         scale_aligned_with_colmap=scale_aligned,
-        floor_estimated=False,
+        support_plane_estimated=False,
         obstacle_regions_estimated=True,
         outputs={
             "raw_pointcloud": str(raw_path),
@@ -401,7 +405,7 @@ def build_world_model_from_outputs(
         num_dense_points_raw=count_ply_vertices(raw_ply),
         num_dense_points_cleaned=count_ply_vertices(cleaned_ply),
         scale_aligned_with_colmap=scale_aligned,
-        floor_estimated=False,
+        support_plane_estimated=False,
         obstacle_regions_estimated=True,
         outputs={
             "raw_pointcloud": str(raw_ply),

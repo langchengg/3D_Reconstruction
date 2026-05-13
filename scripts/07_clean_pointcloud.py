@@ -26,6 +26,10 @@ def main() -> None:
         radius_outlier_removal=bool(config["cleaning"]["radius_outlier_removal"]),
         radius=float(config["cleaning"]["radius"]),
         radius_nb_points=int(config["cleaning"]["radius_nb_points"]),
+        robust_crop=bool(config["cleaning"].get("robust_crop", True)),
+        robust_crop_mad_scale=float(config["cleaning"].get("robust_crop_mad_scale", 12.0)),
+        robust_crop_min_keep_ratio=float(config["cleaning"].get("robust_crop_min_keep_ratio", 0.25)),
+        adaptive_voxel_min_scene_ratio=float(config["cleaning"].get("adaptive_voxel_min_scene_ratio", 1e-5)),
     )
     path = write_ply_ascii(cleaned, args.output)
     print(f"Wrote {len(cleaned.points)} cleaned points to {path}")
@@ -33,4 +37,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

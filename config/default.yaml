@@ -49,6 +49,10 @@ fusion:
   max_points_per_frame: 80000
 
 cleaning:
+  robust_crop: true
+  robust_crop_mad_scale: 12.0
+  robust_crop_min_keep_ratio: 0.25
+  adaptive_voxel_min_scene_ratio: 0.00001
   remove_outliers: true
   statistical_nb_neighbors: 20
   statistical_std_ratio: 2.0
@@ -57,7 +61,7 @@ cleaning:
   radius_nb_points: 12
 
 world_model:
-  estimate_floor: true
+  estimate_support_plane: true
   estimate_obstacles: true
   save_json: true
 
@@ -80,7 +84,7 @@ presentation:
   depth_grid_max_items: 8
 
 mesh:
-  enabled: true
+  enabled: false
   max_points: 60000
   poisson_depth: 7
   density_quantile: 0.02

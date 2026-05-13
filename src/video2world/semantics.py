@@ -44,25 +44,39 @@ class SemanticResult:
 def derive_geometry_semantics(
     cloud: PointCloud,
     *,
-    distance_threshold: float = 0.08,
+    distance_threshold: float | None = None,
+    distance_threshold_ratio: float = 0.005,
     obstacle_height: float | None = 0.25,
     ransac_iterations: int = 300,
     random_seed: int = 13,
 ) -> SemanticResult:
     points = np.asarray(cloud.points, dtype=np.float64).reshape((-1, 3))
     labels = np.full(len(points), LABEL_UNKNOWN, dtype=np.uint8)
+    scene_bbox_diagonal = _scene_bbox_diagonal(points)
+    resolved_distance_threshold = _resolve_distance_threshold(
+        points,
+        distance_threshold=distance_threshold,
+        distance_threshold_ratio=distance_threshold_ratio,
+    )
     if len(points) < 3:
-        return _semantic_result(cloud, labels, None, "too_few_points")
+        return _semantic_result(
+            cloud,
+            labels,
+            None,
+            "too_few_points",
+            distance_threshold=resolved_distance_threshold,
+            scene_bbox_diagonal=scene_bbox_diagonal,
+        )
 
     plane = fit_dominant_plane(
         points,
-        distance_threshold=distance_threshold,
+        distance_threshold=resolved_distance_threshold,
         ransac_iterations=ransac_iterations,
         random_seed=random_seed,
     )
     signed_distance = points @ plane.normal + plane.offset
-    resolved_obstacle_height = _resolve_obstacle_height(signed_distance, distance_threshold, obstacle_height)
-    support_mask = np.abs(signed_distance) <= distance_threshold
+    resolved_obstacle_height = _resolve_obstacle_height(signed_distance, resolved_distance_threshold, obstacle_height)
+    support_mask = np.abs(signed_distance) <= resolved_distance_threshold
     obstacle_mask = signed_distance >= resolved_obstacle_height
 
     labels[support_mask] = LABEL_SUPPORT_PLANE
@@ -73,6 +87,8 @@ def derive_geometry_semantics(
         plane,
         "geometry_derived_plane_and_height_labels",
         obstacle_height=resolved_obstacle_height,
+        distance_threshold=resolved_distance_threshold,
+        scene_bbox_diagonal=scene_bbox_diagonal,
     )
 
 
@@ -160,9 +176,12 @@ def attach_semantics_to_world_model(world_model_path: str | Path, summary: dict,
         "num_labeled_points": summary.get("num_labeled_points", 0),
         "semantic_coverage": summary.get("semantic_coverage", 0.0),
         "method": summary.get("method", "geometry_derived_plane_and_height_labels"),
+        "distance_threshold": summary.get("distance_threshold"),
+        "obstacle_height": summary.get("obstacle_height"),
+        "scene_bbox_diagonal": summary.get("scene_bbox_diagonal"),
     }
     robot_cues = data.setdefault("robot_relevant_cues", {})
-    robot_cues["floor_estimated"] = summary.get("label_counts", {}).get("support_plane", 0) > 0
+    robot_cues["support_plane_estimated"] = summary.get("label_counts", {}).get("support_plane", 0) > 0
     robot_cues["obstacle_regions_estimated"] = summary.get("label_counts", {}).get("obstacle", 0) > 0
     path.write_text(json.dumps(data, indent=2, sort_keys=False), encoding="utf-8")
 
@@ -174,6 +193,8 @@ def _semantic_result(
     method: str,
     *,
     obstacle_height: float | None = None,
+    distance_threshold: float | None = None,
+    scene_bbox_diagonal: float | None = None,
 ) -> SemanticResult:
     colors = np.stack([LABEL_COLORS[int(label)] for label in labels], axis=0).astype(np.uint8) if len(labels) else np.empty((0, 3), dtype=np.uint8)
     semantic_cloud = PointCloud(points=cloud.points.copy(), colors=colors, frame_ids=list(cloud.frame_ids))
@@ -190,6 +211,10 @@ def _semantic_result(
     }
     if obstacle_height is not None:
         summary["obstacle_height"] = float(obstacle_height)
+    if distance_threshold is not None:
+        summary["distance_threshold"] = float(distance_threshold)
+    if scene_bbox_diagonal is not None:
+        summary["scene_bbox_diagonal"] = float(scene_bbox_diagonal)
     if plane is not None:
         summary["support_plane"] = {
             "normal": plane.normal.tolist(),
@@ -197,6 +222,27 @@ def _semantic_result(
             "num_inliers": plane.num_inliers,
         }
     return SemanticResult(labels=labels, semantic_cloud=semantic_cloud, plane=plane, summary=summary)
+
+
+def _resolve_distance_threshold(
+    points: np.ndarray,
+    *,
+    distance_threshold: float | None,
+    distance_threshold_ratio: float,
+) -> float:
+    if distance_threshold is not None:
+        return float(distance_threshold)
+    diagonal = _scene_bbox_diagonal(points)
+    if diagonal <= 1e-9:
+        return 1e-3
+    return float(max(1e-6, diagonal * distance_threshold_ratio))
+
+
+def _scene_bbox_diagonal(points: np.ndarray) -> float:
+    pts = np.asarray(points, dtype=np.float64).reshape((-1, 3))
+    if len(pts) == 0:
+        return 0.0
+    return float(np.linalg.norm(np.max(pts, axis=0) - np.min(pts, axis=0)))
 
 
 def _resolve_obstacle_height(signed_distance: np.ndarray, distance_threshold: float, obstacle_height: float | None) -> float:

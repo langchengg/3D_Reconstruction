@@ -54,3 +54,30 @@ def test_derive_geometry_semantics_uses_adaptive_obstacle_height_when_unspecifie
 
     assert result.summary["obstacle_height"] > 0.03
     assert int(np.sum(result.labels == LABEL_OBSTACLE)) <= len(obstacle_points)
+
+
+def test_derive_geometry_semantics_scales_distance_threshold_with_scene_size():
+    floor_points = np.array(
+        [[x * 10.0, y * 10.0, 0.0] for x in range(4) for y in range(4)],
+        dtype=np.float64,
+    )
+    obstacle_points = np.array([[5.0, 5.0, 8.0]], dtype=np.float64)
+    points = np.vstack([floor_points, obstacle_points])
+    cloud = PointCloud(
+        points=points,
+        colors=np.full((len(points), 3), 180, dtype=np.uint8),
+        frame_ids=[0] * len(points),
+    )
+
+    result = derive_geometry_semantics(
+        cloud,
+        distance_threshold=None,
+        distance_threshold_ratio=0.01,
+        obstacle_height=1.0,
+        ransac_iterations=80,
+        random_seed=17,
+    )
+
+    bbox_diagonal = float(np.linalg.norm(points.max(axis=0) - points.min(axis=0)))
+    assert np.isclose(result.summary["scene_bbox_diagonal"], bbox_diagonal)
+    assert np.isclose(result.summary["distance_threshold"], bbox_diagonal * 0.01)

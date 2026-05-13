@@ -14,7 +14,7 @@ def test_save_world_model_writes_robot_relevant_contract(tmp_path: Path):
         num_dense_points_raw=100,
         num_dense_points_cleaned=70,
         scale_aligned_with_colmap=True,
-        floor_estimated=False,
+        support_plane_estimated=False,
         obstacle_regions_estimated=True,
         outputs={"cleaned_pointcloud": "outputs/pointclouds/cleaned_scene.ply"},
     )

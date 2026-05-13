@@ -1,11 +1,11 @@
 {
-  "scene_id": "IMG_9574",
-  "input_video": "data/raw/IMG_9574.MOV",
-  "num_keyframes": 22,
-  "num_registered_frames": 22,
-  "num_sparse_points": 8369,
-  "num_dense_points_raw": 1143648,
-  "num_dense_points_cleaned": 1101192,
+  "scene_id": "IMG_9576",
+  "input_video": "data/raw/IMG_9576.MOV",
+  "num_keyframes": 60,
+  "num_registered_frames": 60,
+  "num_sparse_points": 9482,
+  "num_dense_points_raw": 3119040,
+  "num_dense_points_cleaned": 2971256,
   "outputs": {
     "raw_pointcloud": "outputs/readme_latest/pointclouds/raw_scene.ply",
     "cleaned_pointcloud": "outputs/readme_latest/pointclouds/cleaned_scene.ply",
@@ -15,8 +15,6 @@
     "hero_scene": "outputs/readme_latest/visualizations/hero_scene.png",
     "hero_camera_view": "outputs/readme_latest/visualizations/hero_camera_view.png",
     "depth_grid": "outputs/readme_latest/visualizations/depth_grid.png",
-    "mesh": "outputs/readme_latest/meshes/scene_mesh.ply",
-    "mesh_preview": "outputs/readme_latest/visualizations/mesh_preview.png",
     "semantic_pointcloud": "outputs/readme_latest/pointclouds/semantic_scene.ply",
     "semantic_preview": "outputs/readme_latest/visualizations/semantic_scene.png",
     "semantic_summary": "outputs/readme_latest/world_model/semantic_objects.json"
@@ -29,7 +27,7 @@
     "The coordinate frame is inherited from COLMAP and is not gravity-aligned by default."
   ],
   "robot_relevant_cues": {
-    "floor_estimated": true,
+    "support_plane_estimated": true,
     "obstacle_regions_estimated": true,
     "scale_aligned_with_colmap": true
   },
@@ -40,8 +38,11 @@
       "obstacle",
       "unknown"
     ],
-    "num_labeled_points": 246698,
-    "semantic_coverage": 0.24943378980659878,
-    "method": "geometry_derived_plane_and_height_labels"
+    "num_labeled_points": 654040,
+    "semantic_coverage": 0.32811969315159756,
+    "method": "geometry_derived_plane_and_height_labels",
+    "distance_threshold": 0.365975612154614,
+    "obstacle_height": 5.714061173305753,
+    "scene_bbox_diagonal": 73.1951224309228
   }
 }

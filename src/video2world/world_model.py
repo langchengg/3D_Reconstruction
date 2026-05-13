@@ -23,7 +23,7 @@ class WorldModelSummary:
     num_dense_points_raw: int
     num_dense_points_cleaned: int
     scale_aligned_with_colmap: bool
-    floor_estimated: bool
+    support_plane_estimated: bool
     obstacle_regions_estimated: bool
     outputs: dict[str, str]
     coordinate_frame: str = "COLMAP_world"
@@ -33,7 +33,7 @@ class WorldModelSummary:
 def world_model_dict(summary: WorldModelSummary) -> dict:
     data = asdict(summary)
     robot_cues = {
-        "floor_estimated": data.pop("floor_estimated"),
+        "support_plane_estimated": data.pop("support_plane_estimated"),
         "obstacle_regions_estimated": data.pop("obstacle_regions_estimated"),
         "scale_aligned_with_colmap": data.pop("scale_aligned_with_colmap"),
     }
@@ -46,4 +46,3 @@ def save_world_model(summary: WorldModelSummary, output_path: str | Path) -> Pat
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(world_model_dict(summary), indent=2, sort_keys=False), encoding="utf-8")
     return path
-

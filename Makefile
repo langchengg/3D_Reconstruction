@@ -3,7 +3,7 @@ VIDEO ?= data/raw/input_video.mp4
 RUN_DIR ?= outputs/demo_room
 CONFIG ?= config/default.yaml
 
-.PHONY: setup check demo smoke test readme-assets semantics evaluate submission-assets
+.PHONY: setup check demo smoke smoke-demo view-example test readme-assets semantics evaluate submission-assets
 
 setup:
 	python -m venv .venv
@@ -32,6 +32,11 @@ submission-assets:
 
 smoke:
 	$(PYTHON) scripts/04_estimate_depth.py --frames data/frames --output outputs/depth_smoke --depth-mode heuristic
+
+view-example:
+	$(PYTHON) scripts/14_check_example_assets.py --example-dir assets/example_outputs
+
+smoke-demo: view-example
 
 test:
 	$(PYTHON) -m pytest
